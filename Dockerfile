@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
 ENV PATH="/usr/local/MATLAB/from-host/bin:${PATH}"
 ENV MATLABPATH=/opt/freesurfer/matlab
 
-pip3 install ipython
+RUN pip3 install ipython
 
 RUN mkdir -p /code
 COPY run.py /code/run.py
