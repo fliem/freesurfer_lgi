@@ -6,3 +6,4 @@ RUN apt-get update && apt-get install -y \
     libblas-dev liblapack-dev gfortran build-essential xorg
 
 ENV PATH="/usr/local/MATLAB/from-host/bin:${PATH}"
+ENV MATLABPATH=/opt/freesurfer/matlab
