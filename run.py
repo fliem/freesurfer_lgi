@@ -107,9 +107,14 @@ if args.analysis_level == "participant":
 
                 print(cmd)
                 run(cmd)
-                if (os.path.exists(os.path.join(surf_dir, "lh.pial_lgi"))) & (os.path.exists(os.path.join(surf_dir,
-                                                                                                          "rh.pial_lgi"))):
-                    print("lh.pial_lgi and rh.pial_lgi calculated for {sub} {tp}".format(sub=subject_label,tp=tp))
+                img_not_found = []
+                if not os.path.exists(os.path.join(surf_dir, "lh.pial_lgi")):
+                    img_not_found.append("lh.pial_lgi")
+                if not os.path.exists(os.path.join(surf_dir, "rh.pial_lgi")):
+                    img_not_found.append("rh.pial_lgi")
+
+                if img_not_found:
+                    raise Exception("pial_lgi not found after calc for {sub} {tp}: {img}".format(
+                        sub=subject_label, tp=tp, img=" ".join(img_not_found)))
                 else:
-                    raise Exception("lh.pial_lgi and rh.pial_lgi not found after calc for {sub} {tp}".format(
-                        sub=subject_label,tp=tp))
+                    print("pial_lgi and rh.pial_lgi calculated for {sub} {tp}".format(sub=subject_label,tp=tp))
