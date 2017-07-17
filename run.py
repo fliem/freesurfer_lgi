@@ -88,15 +88,17 @@ if args.analysis_level == "participant":
 
         long_subjects = glob(os.path.join(output_dir, "sub-" + subject_label + "*.long.*"))
         long_subjects = [os.path.basename(s) for s in long_subjects]
-        timepoints = [l.split(".long.")[0] for l in long_subjects]
+        timepoints = sorted([l.split(".long.")[0] for l in long_subjects])
 
         for tp in timepoints:
-            surf_dir = os.path.join(output_dir, "sub-{sub}_ses-{ses}.long.sub-{sub}".format(sub=subject_label,
-                                                                                            ses=tp))
+            tp_label = tp.split("_")[-1].split("-")[-1]
+            surf_dir = os.path.join(output_dir,
+                                    "sub-{sub}_ses-{ses}.long.sub-{sub}".format(sub=subject_label, ses=tp_label),
+                                    "surf")
             if (os.path.exists(os.path.join(surf_dir, "lh.pial_lgi"))) & (os.path.exists(os.path.join(surf_dir,
                                                                                                       "rh.pial_lgi"))):
                 print("lh.pial_lgi and rh.pial_lgi exist for {sub} {tp}. NOT recomputing".format(sub=subject_label,
-                                                                                              tp=tp))
+                                                                                              tp=tp_label))
             else:
                 cmd = "recon-all -long {tp} {base} " \
                   "-sd {output_dir} -localGI -parallel -openmp {n_cpus}".format(tp=tp, base="sub-" + subject_label,
@@ -115,6 +117,6 @@ if args.analysis_level == "participant":
 
                 if img_not_found:
                     raise Exception("pial_lgi not found after calc for {sub} {tp}: {img}".format(
-                        sub=subject_label, tp=tp, img=" ".join(img_not_found)))
+                        sub=subject_label, tp=tp_label, img=" ".join(img_not_found)))
                 else:
-                    print("pial_lgi and rh.pial_lgi calculated for {sub} {tp}".format(sub=subject_label,tp=tp))
+                    print("pial_lgi and rh.pial_lgi calculated for {sub} {tp}".format(sub=subject_label,tp=tp_label))
