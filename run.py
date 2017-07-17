@@ -107,3 +107,9 @@ if args.analysis_level == "participant":
 
                 print(cmd)
                 run(cmd)
+                if (os.path.exists(os.path.join(surf_dir, "lh.pial_lgi"))) & (os.path.exists(os.path.join(surf_dir,
+                                                                                                          "rh.pial_lgi"))):
+                    print("lh.pial_lgi and rh.pial_lgi calculated for {sub} {tp}".format(sub=subject_label,tp=tp))
+                else:
+                    raise Exception("lh.pial_lgi and rh.pial_lgi not found after calc for {sub} {tp}".format(
+                        sub=subject_label,tp=tp))
