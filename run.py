@@ -71,17 +71,18 @@ output_dir = os.path.abspath(args.output_dir)
 # running participant level
 if args.analysis_level == "participant":
     if not os.path.exists(os.path.join(output_dir, "fsaverage")):
+        print("try to copy fsaverage folder %s" % output_dir)
         run("cp -rf " + os.path.join(os.environ["SUBJECTS_DIR"], "fsaverage") + " " + os.path.join(output_dir,
                                                                                                    "fsaverage"),
-            ignore_errors=True)
+            ignore_errors=False)
     if not os.path.exists(os.path.join(output_dir, "lh.EC_average")):
         run("cp -rf " + os.path.join(os.environ["SUBJECTS_DIR"], "lh.EC_average") + " " + os.path.join(output_dir,
                                                                                                        "lh.EC_average"),
-            ignore_errors=True)
+            ignore_errors=False)
     if not os.path.exists(os.path.join(output_dir, "rh.EC_average")):
         run("cp -rf " + os.path.join(os.environ["SUBJECTS_DIR"], "rh.EC_average") + " " + os.path.join(output_dir,
                                                                                                        "rh.EC_average"),
-            ignore_errors=True)
+            ignore_errors=False)
 
     for subject_label in subjects_to_analyze:
 
