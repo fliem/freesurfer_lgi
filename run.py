@@ -91,12 +91,19 @@ if args.analysis_level == "participant":
         timepoints = [l.split(".long.")[0] for l in long_subjects]
 
         for tp in timepoints:
-            cmd = "recon-all -long {tp} {base} " \
+            surf_dir = os.path.join(output_dir, "sub-{sub}_ses-{ses}.long.sub-{sub}".format(sub=subject_label,
+                                                                                            ses=tp))
+            if (os.path.exists(os.path.join(surf_dir, "lh.pial_lgi"))) & (os.path.exists(os.path.join(surf_dir,
+                                                                                                      "rh.pial_lgi"))):
+                print("lh.pial_lgi and rh.pial_lgi exist for {sub} {tp}. NOT recomputing".format(sub=subject_label,
+                                                                                              tp=tp))
+            else:
+                cmd = "recon-all -long {tp} {base} " \
                   "-sd {output_dir} -localGI -parallel -openmp {n_cpus}".format(tp=tp, base="sub-" + subject_label,
                                                                                 output_dir=output_dir,
                                                                                 n_cpus=args.n_cpus)
 
-            print("\n\n", "*" * 30, "\n", "running long LGI for %s" % tp)
+                print("\n\n", "*" * 30, "\n", "running long LGI for %s" % tp)
 
-            print(cmd)
-            run(cmd)
+                print(cmd)
+                run(cmd)
