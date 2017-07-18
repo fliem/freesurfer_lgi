@@ -70,6 +70,10 @@ output_dir = os.path.abspath(args.output_dir)
 
 # running participant level
 if args.analysis_level == "participant":
+    c = glob(os.path.join(output_dir, "*"))
+    print("output_dir content: %s" % c)
+    if not c:
+        raise Exception("output dir empty %s" % output_dir)
     if not os.path.exists(os.path.join(output_dir, "fsaverage")):
         print("try to copy fsaverage folder %s" % output_dir)
         run("cp -rf " + os.path.join(os.environ["SUBJECTS_DIR"], "fsaverage") + " " + os.path.join(output_dir,
@@ -103,12 +107,12 @@ if args.analysis_level == "participant":
             if (os.path.exists(os.path.join(surf_dir, "lh.pial_lgi"))) & (os.path.exists(os.path.join(surf_dir,
                                                                                                       "rh.pial_lgi"))):
                 print("lh.pial_lgi and rh.pial_lgi exist for {sub} {tp}. NOT recomputing".format(sub=subject_label,
-                                                                                              tp=tp_label))
+                                                                                                 tp=tp_label))
             else:
                 cmd = "recon-all -long {tp} {base} " \
-                  "-sd {output_dir} -localGI -parallel -openmp {n_cpus}".format(tp=tp, base="sub-" + subject_label,
-                                                                                output_dir=output_dir,
-                                                                                n_cpus=args.n_cpus)
+                      "-sd {output_dir} -localGI -parallel -openmp {n_cpus}".format(tp=tp, base="sub-" + subject_label,
+                                                                                    output_dir=output_dir,
+                                                                                    n_cpus=args.n_cpus)
 
                 print("\n\n", "*" * 30, "\n", "running long LGI for %s" % tp)
 
@@ -124,4 +128,4 @@ if args.analysis_level == "participant":
                     raise Exception("pial_lgi not found after calc for {sub} {tp}: {img}".format(
                         sub=subject_label, tp=tp_label, img=" ".join(img_not_found)))
                 else:
-                    print("pial_lgi and rh.pial_lgi calculated for {sub} {tp}".format(sub=subject_label,tp=tp_label))
+                    print("pial_lgi and rh.pial_lgi calculated for {sub} {tp}".format(sub=subject_label, tp=tp_label))
