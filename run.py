@@ -74,6 +74,7 @@ if args.analysis_level == "participant":
     print("output_dir content: %s" % c)
     if not c:
         raise Exception("output dir empty %s" % output_dir)
+
     if not os.path.exists(os.path.join(output_dir, "fsaverage")):
         print("try to copy fsaverage folder %s" % output_dir)
         run("cp -rf " + os.path.join(os.environ["SUBJECTS_DIR"], "fsaverage") + " " + os.path.join(output_dir,
@@ -98,6 +99,8 @@ if args.analysis_level == "participant":
             raise Exception("No timepoints found. Something went wrong: %s" % subject_label)
         else:
             print("Timepoints for subject found %s" % subject_label, timepoints)
+        good_tps = []
+        bad_tps = []
 
         for tp in timepoints:
             tp_label = tp.split("_")[-1].split("-")[-1]
@@ -117,15 +120,33 @@ if args.analysis_level == "participant":
                 print("\n\n", "*" * 30, "\n", "running long LGI for %s" % tp)
 
                 print(cmd)
-                run(cmd)
-                img_not_found = []
-                if not os.path.exists(os.path.join(surf_dir, "lh.pial_lgi")):
-                    img_not_found.append("lh.pial_lgi")
-                if not os.path.exists(os.path.join(surf_dir, "rh.pial_lgi")):
-                    img_not_found.append("rh.pial_lgi")
+                try:
+                    run(cmd)
 
-                if img_not_found:
-                    raise Exception("pial_lgi not found after calc for {sub} {tp}: {img}".format(
-                        sub=subject_label, tp=tp_label, img=" ".join(img_not_found)))
+                    img_not_found = []
+                    if not os.path.exists(os.path.join(surf_dir, "lh.pial_lgi")):
+                        img_not_found.append("lh.pial_lgi")
+                    if not os.path.exists(os.path.join(surf_dir, "rh.pial_lgi")):
+                        img_not_found.append("rh.pial_lgi")
+
+                    if img_not_found:
+                        print("pial_lgi not found after calc for {sub} {tp}: {img}. Try other timpoints and "
+                              "raiser Error later.".format(
+                            sub=subject_label, tp=tp_label, img=" ".join(img_not_found)))
+                        bad_tps.append(tp_label)
+                    else:
+                        print("pial_lgi and rh.pial_lgi calculated for {sub} {tp}".format(sub=subject_label, tp=tp_label))
+                        good_tps.append(tp_label)
+                except Exception:
+                    print("Something failed with tp %s. Try other timepoints and raise Error later." % tp_label)
+                    bad_tps.append(tp_label)
+
+                if good_tps:
+                    print("Timpoints succesfully processed for {sub}: {tps}".format(sub=subject_label, tps=" ".join(
+                        good_tps)))
+                if bad_tps:
+                    raise Exception("Timpoints failed for {sub}: {tps}".format(sub=subject_label, tps=" ".join(
+                        bad_tps)))
                 else:
-                    print("pial_lgi and rh.pial_lgi calculated for {sub} {tp}".format(sub=subject_label, tp=tp_label))
+                    print("Everything seems fine")
+
