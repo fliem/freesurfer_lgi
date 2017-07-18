@@ -111,6 +111,7 @@ if args.analysis_level == "participant":
                                                                                                       "rh.pial_lgi"))):
                 print("lh.pial_lgi and rh.pial_lgi exist for {sub} {tp}. NOT recomputing".format(sub=subject_label,
                                                                                                  tp=tp_label))
+                good_tps.append(tp_label)
             else:
                 cmd = "recon-all -long {tp} {base} " \
                       "-sd {output_dir} -localGI -parallel -openmp {n_cpus}".format(tp=tp, base="sub-" + subject_label,
@@ -141,12 +142,12 @@ if args.analysis_level == "participant":
                     print("Something failed with tp %s. Try other timepoints and raise Error later." % tp_label)
                     bad_tps.append(tp_label)
 
-                if good_tps:
-                    print("Timpoints succesfully processed for {sub}: {tps}".format(sub=subject_label, tps=" ".join(
-                        good_tps)))
-                if bad_tps:
-                    raise Exception("Timpoints failed for {sub}: {tps}".format(sub=subject_label, tps=" ".join(
-                        bad_tps)))
-                else:
-                    print("Everything seems fine")
+        if good_tps:
+            print("Timpoints succesfully processed for {sub}: {tps}".format(sub=subject_label, tps=" ".join(
+                good_tps)))
+        if bad_tps:
+            raise Exception("Timpoints failed for {sub}: {tps}".format(sub=subject_label, tps=" ".join(
+                bad_tps)))
+        else:
+            print("Everything seems fine")
 
