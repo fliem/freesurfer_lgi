@@ -90,6 +90,11 @@ if args.analysis_level == "participant":
         long_subjects = [os.path.basename(s) for s in long_subjects]
         timepoints = sorted([l.split(".long.")[0] for l in long_subjects])
 
+        if not timepoints:
+            raise Exception("No timepoints found. Something went wrong: %s" % subject_label)
+        else:
+            print("Timepoints for subject found %s" % subject_label, timepoints)
+
         for tp in timepoints:
             tp_label = tp.split("_")[-1].split("-")[-1]
             surf_dir = os.path.join(output_dir,
