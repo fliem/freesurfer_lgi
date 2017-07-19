@@ -8,7 +8,7 @@ from subprocess import Popen, PIPE
 from shutil import rmtree
 import subprocess
 from warnings import warn
-
+import time
 
 def run(command, env={}, ignore_errors=False):
     merged_env = os.environ
@@ -50,10 +50,30 @@ parser.add_argument('--n_cpus', help='Number of CPUs/cores available to use.',
 parser.add_argument('--license_key',
                     help='FreeSurfer license key - letters and numbers after "*" in the email you received after registration. To register (for free) visit https://surfer.nmr.mgh.harvard.edu/registration.html',
                     required=True)
+parser.add_argument('--wait-for-nfs', dest='wait_for_nfs', action='store_true')
+
 parser.add_argument('-v', '--version', action='version',
                     version='BIDS-App example version {}'.format(__version__))
 
 args = parser.parse_args()
+
+# fix for nfs issues:
+if args.wait_for_nfs:
+    t = 0
+    nfs_found = False
+    t_sleep = 10
+    time_out = 100
+    while (t < time_out) & (not nfs_found):
+        files = glob(os.path.join(args.output_dir, "*"))
+        if files:
+            nfs_found = True
+            print("NFS found. Start computations.")
+        else:
+            print("Waiting for NFS.")
+            time.sleep(t_sleep)
+            t += t_sleep
+    if not nfs_found:
+        raise Exception("NFS not found for %s seconds. Stopping" % t)
 
 subjects_to_analyze = []
 # only for a subset of subjects
@@ -70,11 +90,6 @@ output_dir = os.path.abspath(args.output_dir)
 
 # running participant level
 if args.analysis_level == "participant":
-    c = glob(os.path.join(output_dir, "*"))
-    print("output_dir content: %s" % c)
-    if not c:
-        raise Exception("output dir empty %s" % output_dir)
-
     if not os.path.exists(os.path.join(output_dir, "fsaverage")):
         print("try to copy fsaverage folder %s" % output_dir)
         run("cp -rf " + os.path.join(os.environ["SUBJECTS_DIR"], "fsaverage") + " " + os.path.join(output_dir,
@@ -150,4 +165,3 @@ if args.analysis_level == "participant":
                 bad_tps)))
         else:
             print("Everything seems fine")
-
